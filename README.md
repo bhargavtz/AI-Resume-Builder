@@ -1,5 +1,4 @@
 
-https://ai-resume-builder-opal.vercel.app/
 
 Currently, two official plugins are available:
 
