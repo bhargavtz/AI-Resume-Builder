@@ -10,10 +10,9 @@ import {
   } from "@/components/ui/dialog"
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { v4 as uuidv4 } from 'uuid';
 import GlobalApi from './../../../service/GlobalApi'
 import { useUser } from '@clerk/clerk-react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 
 
@@ -26,24 +25,35 @@ function AddResume() {
     const navigation=useNavigate();
     const onCreate=async()=>{
         setLoading(true)
-        const uuid=uuidv4();
+        console.log("Attempting to create resume with title:", resumeTitle);
         const data={
-            data:{
-                title:resumeTitle,
-                resumeId:uuid,
-                userEmail:user?.primaryEmailAddress?.emailAddress,
-                userName:user?.fullName
-            }
+            title:resumeTitle,
+            userId:user?.primaryEmailAddress?.emailAddress, // Using user email as userId
+            content:{} // Initial empty content for the resume
         }
 
         GlobalApi.CreateNewResume(data).then(resp=>{
-            console.log(resp.data.data.documentId);
-            if(resp)
-            {
+            console.log("Resume creation successful. Full response:", resp);
+            console.log("Response data:", resp.data);
+
+            let resumeId;
+            if (Array.isArray(resp.data) && resp.data.length > 0) {
+                resumeId = resp.data[0]._id;
+                console.log("New resume ID (from array):", resumeId);
+            } else if (resp.data && resp.data._id) {
+                resumeId = resp.data._id;
+                console.log("New resume ID (from object):", resumeId);
+            } else {
+                console.error("Could not find resume ID in response:", resp.data);
                 setLoading(false);
-                navigation('/dashboard/resume/'+resp.data.data.documentId+"/edit");
+                return; // Stop execution if ID is not found
             }
-        },(error)=>{
+
+            setLoading(false);
+            navigation('/dashboard/resume/'+resumeId+"/edit");
+
+        }).catch((error)=>{
+            console.error("Error creating resume:", error);
             setLoading(false);
         })
 

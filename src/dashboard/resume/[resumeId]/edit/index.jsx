@@ -17,9 +17,12 @@ function EditResume() {
 
     const GetResumeInfo=()=>{
         GlobalApi.GetResumeById(resumeId).then(resp=>{
-          console.log(resp.data.data);
-          setResumeInfo(resp.data.data);
-        })
+          console.log("GetResumeInfo API Response:", resp.data);
+          // The new backend returns the resume object directly
+          setResumeInfo(resp.data);
+        }).catch(error => {
+            console.error("Error fetching resume info:", error);
+        });
     }
 
   return (

@@ -32,21 +32,25 @@ function PersonalDetail({enabledNext}) {
         })
     }
 
-    const onSave=(e)=>{
+    const onSave=async (e)=>{
         e.preventDefault();
-        setLoading(true)
-        const data={
-            data:formData
-        }
-        GlobalApi.UpdateResumeDetail(params?.resumeId,data).then(resp=>{
-            console.log(resp);
+        setLoading(true);
+        
+        console.log("Saving personal details for resumeId:", params?.resumeId);
+        console.log("Form Data to be saved:", formData);
+
+        try {
+            // The backend expects the form data directly, not wrapped in 'data'
+            const resp = await GlobalApi.UpdateResumeDetail(params?.resumeId, formData);
+            console.log("Personal Detail Update Response:", resp.data);
             enabledNext(true);
             setLoading(false);
-            toast("Details updated")
-        },(error)=>{
+            toast("Details updated successfully!");
+        } catch (error) {
+            console.error("Error updating personal details:", error);
             setLoading(false);
-        })
-        
+            toast.error("Failed to update details.");
+        }
     }
   return (
     <div className='p-5 shadow-lg rounded-lg border-t-primary border-t-4 mt-10'>

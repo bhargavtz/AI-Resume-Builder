@@ -1,25 +1,23 @@
 import axios from "axios";
 
 
-const API_KEY=import.meta.env.VITE_STRAPI_API_KEY;
 const axiosClient=axios.create({
-    baseURL:import.meta.env.VITE_API_BASE_URL+"/api/",
+    baseURL:import.meta.env.VITE_API_BASE_URL,
     headers:{
-        'Content-Type':'application/json',
-        'Authorization':`Bearer ${API_KEY}`
+        'Content-Type':'application/json'
     }
 })
 
 
-const CreateNewResume=(data)=>axiosClient.post('/user-resumes',data);
+const CreateNewResume=(data)=>axiosClient.post('/resumes',data);
 
-const GetUserResumes=(userEmail)=>axiosClient.get('/user-resumes?filters[userEmail][$eq]='+userEmail);
+const GetUserResumes=()=>axiosClient.get('/resumes'); // Simplified for now, will fetch all resumes
 
-const UpdateResumeDetail=(id,data)=>axiosClient.put('/user-resumes/'+id,data)
+const UpdateResumeDetail=(id,data)=>axiosClient.put('/resumes/'+id,data)
 
-const GetResumeById=(id)=>axiosClient.get('/user-resumes/'+id+"?populate=*")
+const GetResumeById=(id)=>axiosClient.get('/resumes/'+id)
 
-const DeleteResumeById=(id)=>axiosClient.delete('/user-resumes/'+id)
+const DeleteResumeById=(id)=>axiosClient.delete('/resumes/'+id)
 
 export default{
     CreateNewResume,

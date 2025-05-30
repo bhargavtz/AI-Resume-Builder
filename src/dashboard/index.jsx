@@ -20,10 +20,10 @@ function Dashboard() {
    */
   const GetResumesList = () => {
     setIsLoading(true);
-    GlobalApi.GetUserResumes(user?.primaryEmailAddress?.emailAddress)
+    GlobalApi.GetUserResumes()
       .then((resp) => {
         console.log("API Response:", resp.data);
-        setResumeList(resp.data?.data || []);
+        setResumeList(resp.data || []);
       })
       .catch((error) => {
         console.error("Error fetching resumes:", error);
