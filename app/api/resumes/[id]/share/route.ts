@@ -27,7 +27,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
         // Generate share token if not exists
         if (!resume.shareToken) {
-            resume.shareToken = generateShareToken();
+            const tokenData = generateShareToken();
+            resume.shareToken = tokenData.token;
+            resume.shareTokenExpiry = tokenData.expiresAt;
+            resume.shareTokenMaxViews = tokenData.maxViews;
         }
 
         resume.shareEnabled = true;
