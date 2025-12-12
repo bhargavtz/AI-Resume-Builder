@@ -81,9 +81,13 @@ export async function generateDOCX(resumeContent: ResumeContent): Promise<Blob> 
                             ]
                         }),
                         new Paragraph({
-                            text: `${exp.companyName}, ${exp.city}, ${exp.state}`,
-                            italics: true,
-                            spacing: { after: 100 }
+                            spacing: { after: 100 },
+                            children: [
+                                new TextRun({
+                                    text: `${exp.companyName}, ${exp.city}, ${exp.state}`,
+                                    italics: true
+                                })
+                            ]
                         }),
                         new Paragraph({
                             text: exp.workSummary?.replace(/<[^>]*>/g, '') || '',
