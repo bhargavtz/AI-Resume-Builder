@@ -1,0 +1,8 @@
+# User-agent: *
+# Allow: /
+# Disallow: /api/
+# Disallow: /dashboard/
+# Disallow: /my-resume/
+
+# Sitemap
+Sitemap: ${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/sitemap.xml

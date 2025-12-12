@@ -1,141 +1,258 @@
 # AI Resume Builder
 
-A comprehensive web application designed to help users create, manage, and customize professional resumes with the assistance of AI. This tool streamlines the resume creation process, offering various templates, real-time previews, and AI-powered suggestions to enhance content and formatting.
+A modern, AI-powered resume builder built with Next.js, TypeScript, and Gemini AI. Create professional, ATS-optimized resumes in minutes with intelligent AI assistance.
 
-## Table of Contents
+![AI Resume Builder](https://img.shields.io/badge/Next.js-16.0.8-black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-* [Features](#features)
-* [Prerequisites](#prerequisites)
-* [Installation](#installation)
-* [Configuration](#configuration)
-* [Usage](#usage)
-* [API Documentation](#api-documentation)
-* [Contributing](#contributing)
-* [License](#license)
-* [Contact and Support](#contact-and-support)
-* [Troubleshooting](#troubleshooting)
+## ✨ Features
 
-## Features
+### 🤖 AI-Powered Features
+- **AI Writing Assistant** - Generate professional summaries and bullet points
+- **Smart Suggestions** - Get AI-powered content recommendations
+- **ATS Optimization** - Ensure your resume passes applicant tracking systems
+- **Auto-Save** - Never lose your work with automatic saving
 
-* **AI-Powered Content Generation:** Leverage advanced AI models to receive intelligent recommendations for resume content, including impactful phrasing, relevant keywords, and structured bullet points for experience and summary sections. This helps users craft compelling narratives without starting from scratch.
-* **Rich Text Editing:** Utilize a comprehensive rich text editor for detailed customization of all resume sections, allowing for precise formatting, bolding, italics, and list creation.
-* **Customizable Templates & Themes:** Select from a growing library of professionally designed resume templates and apply various color themes to match personal branding or industry standards.
-* **Real-time Live Preview:** Instantly visualize all changes as they are made in a side-by-side preview, ensuring the final output matches expectations before export.
-* **Intuitive User Dashboard:** A centralized dashboard provides a clear overview of all created resumes, allowing users to easily manage, duplicate, edit, and delete their documents.
-* **Secure User Authentication:** Robust sign-in and sign-up functionalities ensure secure access to user data and personalized resume projects.
-* **Dynamic Form Sections:** Structured forms for personal details, education, experience, and skills guide users through the resume creation process, ensuring all necessary information is captured.
-* **Export Options:** (Assumed, can be added if implemented) Export your polished resumes into widely accepted formats like PDF, making them ready for job applications.
+### 📝 Resume Management
+- **Unlimited Resumes** - Create as many resumes as you need
+- **Easy Editing** - Intuitive interface with real-time preview
+- **Multiple Actions** - Edit, duplicate, delete, download resumes
+- **Template System** - Professional templates ready to use
 
-## Prerequisites
+### 🎨 User Experience
+- **Real-time Preview** - See changes instantly as you type
+- **Responsive Design** - Works perfectly on all devices
+- **Dark/Light Mode** - Theme support for comfortable editing
+- **Modern UI** - Beautiful interface with smooth animations
 
-Before you begin, ensure you have the following installed on your system:
+### 🔒 Security & Authentication
+- **Clerk Authentication** - Secure user authentication
+- **User Isolation** - Each user can only access their own resumes
+- **Data Privacy** - Your data is secure and private
 
-* **Node.js:** Version 18 or higher. You can download it from [nodejs.org](https://nodejs.org/).
-* **npm** (Node Package Manager) or **Yarn:** npm comes bundled with Node.js. If you prefer Yarn, you can install it via `npm install -g yarn`.
+## 🚀 Tech Stack
 
-## Installation
+- **Framework**: Next.js 16.0.8 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **UI Components**: shadcn/ui + Radix UI
+- **Database**: MongoDB with Mongoose
+- **Authentication**: Clerk
+- **AI**: Google Gemini 2.0 Flash
+- **Rate Limiting**: Upstash Redis (Recommended for Production)
+- **Security**: Share Token Expiration, Circuit Breakers
+- **Animations**: Framer Motion
+- **Icons**: Lucide React
 
-Follow these detailed steps to get the AI Resume Builder up and running on your local machine. These instructions are applicable across Windows, macOS, and Linux environments.
+## 📦 Installation
 
-1. **Clone the repository:**
+### Prerequisites
+- Node.js 18+ 
+- MongoDB database
+- Clerk account
+- Google Gemini API key
 
+### Setup
+
+1. **Clone the repository**
 ```bash
 git clone https://github.com/bhargavtz/AI-Resume-Builder.git
 cd AI-Resume-Builder
 ```
 
-2. **Install dependencies:**
-
+2. **Install dependencies**
 ```bash
 npm install
-# or
-yarn install
 ```
 
-## Configuration
+3. **Environment Variables**
 
-1. **Create a `.env.local` file:**
+Create a `.env.local` file in the root directory:
 
-2. **Add environment variables:**
+```env
+# Clerk Authentication
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+CLERK_SECRET_KEY=your_clerk_secret_key
 
+# MongoDB
+MONGODB_URI=your_mongodb_connection_string
+
+# Google Gemini AI
+GEMINI_API_KEY=your_gemini_api_key
+
+# Application URL (Required for Share Links)
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Upstash Redis (Optional - Recommended for Production Rate Limiting)
+UPSTASH_REDIS_URL=your_upstash_redis_url
+UPSTASH_REDIS_TOKEN=your_upstash_redis_token
 ```
-VITE_API_KEY=your_api_key_here
-```
 
-*Note:* `.env.local` is in `.gitignore` to prevent accidental commits of sensitive information.
-
-## Usage
-
-1. **Start the development server:**
-
+4. **Run the development server**
 ```bash
 npm run dev
-# or
-yarn dev
 ```
 
-2. **Access the application:**
-   Navigate to the displayed local URL (e.g., `http://localhost:5173`).
+5. **Open your browser**
+Navigate to [http://localhost:3000](http://localhost:3000)
 
-3. **Sign In/Sign Up:**
+## 📁 Project Structure
 
-* New users can register; existing users can sign in.
-
-4. **Create and Edit Resumes:**
-
-* Add, edit, and manage resumes via the dashboard.
-* Use AI features for content suggestions.
-* View real-time previews.
-* Export to PDF (if available).
-
-## API Documentation
-
-* **`service/GlobalApi.js`**: General API requests for resumes.
-* **`service/AIModal.js`**: AI-specific content generation calls.
-
-**Authentication:** Uses `VITE_API_KEY`.
-
-## Contributing
-
-1. **Fork and clone the repository:**
-
-```bash
-git clone https://github.com/bhargavtz/AI-Resume-Builder.git
+```
+AI-Resume-Builder/
+├── app/                      # Next.js app directory
+│   ├── api/                 # API routes
+│   │   ├── ai/             # AI-related endpoints
+│   │   └── resumes/        # Resume CRUD operations
+│   ├── dashboard/          # Dashboard pages
+│   ├── pricing/            # Pricing page
+│   ├── faq/                # FAQ page
+│   └── page.tsx            # Landing page
+├── components/              # React components
+│   ├── ui/                 # shadcn/ui components
+│   ├── resume/             # Resume-specific components
+│   ├── Navbar.tsx          # Navigation bar
+│   ├── Footer.tsx          # Footer component
+│   └── ResumeItem.tsx      # Resume card component
+├── lib/                     # Utility libraries
+│   ├── db.ts               # Database connection
+│   ├── models/             # Mongoose models
+│   └── utils.ts            # Utility functions
+├── service/                 # Service layer
+│   ├── GlobalApi.ts        # API service
+│   └── AIService.ts        # AI service
+├── context/                 # React context
+│   └── ResumeInfoContext.tsx
+└── public/                  # Static assets
 ```
 
-2. **Create a branch:**
+## 🎯 Key Features Explained
 
-```bash
-git checkout -b feature/your-feature-name
-```
+### Dashboard
+- View all your resumes in a grid layout
+- Search and filter resumes
+- Quick actions: Create, Edit, Duplicate, Delete
+- Statistics showing total resumes created
 
-3. **Make changes and test.**
-4. **Push and open a Pull Request.**
+### Resume Editor
+- Step-by-step form for easy data entry
+- Real-time preview on the right side
+- Auto-save functionality (saves every second)
+- AI-powered content generation
+- Download as PDF
 
-## License
+### AI Capabilities
+- Generate professional summaries based on job title
+- Create bullet points for work experience
+- Suggest relevant skills
+- Improve existing content
+- ATS optimization suggestions
 
-Licensed under the MIT License. See `LICENSE` file for details.
+## 🔧 API Endpoints
 
-## Contact and Support
+### Resume Management
+- `GET /api/resumes` - Get all user resumes
+- `POST /api/resumes` - Create new resume
+- `GET /api/resumes/[id]` - Get specific resume
+- `PUT /api/resumes/[id]` - Update resume
+- `DELETE /api/resumes/[id]` - Delete resume
 
-* **GitHub Issues:** [AI Resume Builder Issues](https://github.com/bhargavtz/AI-Resume-Builder/issues)
-* **Email:** [bhargavthummar05@gmail.com](mailto:bhargavthummar05@gmail.com)
+### AI Features (Enhanced with Retry Logic & Circuit Breakers)
+- `POST /api/ai/generate-summary` - Generate professional summary
+- `POST /api/ai/generate-bullets` - Generate work experience bullets
+- `POST /api/ai/suggest-skills` - Get skill suggestions
+- `POST /api/ai/improve-resume` - Improve resume content
+- `POST /api/ai/ats-score` - Check ATS compatibility
+- `POST /api/ai/review-resume` - Comprehensive resume review
+- `POST /api/ai/cover-letter` - Generate tailored cover letter
 
-## Troubleshooting
+## 🎨 Customization
 
-* **Installation issues:**
+### Adding New Templates
+1. Create template component in `components/resume/templates/`
+2. Add template preview
+3. Register in template selector
 
-  * Ensure Node.js version is correct.
-  * Clear cache: `npm cache clean --force` or `yarn cache clean`
-  * Delete `node_modules` and lock files, then reinstall.
+### Modifying AI Prompts
+Edit prompts in `service/AIService.ts` to customize AI behavior
 
-* **Port conflicts:**
+### Styling
+- Tailwind classes in components
+- Global styles in `app/globals.css`
+- Theme configuration in `tailwind.config.ts`
 
-  * Terminate processes using the port.
-  * Or configure an alternate port in `vite.config.js`.
+## 🐛 Troubleshooting
 
-* **API Key errors:**
+### Common Issues
 
-  * Verify `.env.local` contents.
-  * Restart the dev server after editing environment variables.
-  * Check API key permissions.
+**MongoDB Connection Error**
+- Verify `MONGODB_URI` in `.env.local`
+- Check network connectivity
+- Ensure MongoDB is running
+
+**Clerk Authentication Issues**
+- Verify Clerk keys in `.env.local`
+- Check Clerk dashboard settings
+- Clear browser cache and cookies
+
+**AI Features Not Working**
+- Verify `GEMINI_API_KEY` is correct
+- Check API quota limits
+- Review console for error messages
+
+## 📝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👤 Author
+
+**Bhargav**
+- GitHub: [@bhargavtz](https://github.com/bhargavtz)
+- Twitter: [@bhargavtz](https://twitter.com/bhargavtz)
+- Email: bhargav05@yandex.com
+
+## 🙏 Acknowledgments
+
+- [Next.js](https://nextjs.org/) - React framework
+- [Tailwind CSS](https://tailwindcss.com/) - Styling
+- [shadcn/ui](https://ui.shadcn.com/) - UI components
+- [Clerk](https://clerk.com/) - Authentication
+- [Google Gemini](https://deepmind.google/technologies/gemini/) - AI capabilities
+- [Framer Motion](https://www.framer.com/motion/) - Animations
+
+## 📊 Project Stats
+
+- **Total Components**: 50+
+- **API Endpoints**: 15+
+- **AI Features**: 5+
+- **Supported Formats**: PDF
+- **Database**: MongoDB
+- **Authentication**: Clerk
+
+## 🔮 Future Enhancements
+
+- [ ] Multiple resume templates
+- [ ] Cover letter generator
+- [ ] LinkedIn profile import
+- [ ] Resume analytics
+- [ ] Team collaboration features
+- [ ] Multi-language support
+
+## 📞 Support
+
+For support, email bhargav05@yandex.com or open an issue on GitHub.
+
+---
+
+Made with ❤️ by Bhargav using Next.js & Gemini AI
