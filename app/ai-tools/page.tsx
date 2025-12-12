@@ -346,7 +346,7 @@ export default function AIToolsPage() {
                                         <label className="block text-sm font-medium mb-2">Context</label>
                                         <select
                                             value={context}
-                                            onChange={(e) => setContext(e.target.value)}
+                                            onChange={(e) => setContext(e.target.value as "experience" | "project")}
                                             className="w-full px-4 py-3 rounded-xl border border-border bg-background focus:border-primary outline-none transition-all"
                                         >
                                             <option value="experience">Work Experience</option>
