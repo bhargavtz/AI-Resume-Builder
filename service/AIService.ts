@@ -1,4 +1,4 @@
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import {
     GenerateSummaryRequest,
     GenerateBulletsRequest,
@@ -9,6 +9,7 @@ import {
     SuggestedSkill,
     ImproveResumeRequest,
     ImproveResumeResponse,
+    ReviewResumeResponse,
     ResumeContent
 } from "@/lib/types";
 
@@ -108,6 +109,16 @@ export const improveResume = async (data: ImproveResumeRequest) => {
 };
 
 // ============================================
+// Comprehensive Resume Review
+// ============================================
+export const reviewResume = async (data: { resumeContent: ResumeContent }) => {
+    return retryWithBackoff(async () => {
+        const response = await axios.post<ReviewResumeResponse>("/api/ai/review-resume", data);
+        return response.data;
+    });
+};
+
+// ============================================
 // Default Export (All Functions)
 // ============================================
 const AIService = {
@@ -117,6 +128,7 @@ const AIService = {
     generateCoverLetter,
     suggestSkills,
     improveResume,
+    reviewResume,
 };
 
 export default AIService;

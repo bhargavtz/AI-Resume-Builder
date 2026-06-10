@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Unit tests
+        run: npm run test
+
+      - name: Build
+        run: npm run build
+        env:
+          MONGODB_URI: mongodb://127.0.0.1:27017/ai-resume-builder-test
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_Y2xlcmsuZGV2LXRlc3Q
+          CLERK_SECRET_KEY: sk_test_Y2xlcmsuZGV2LXRlc3Q
+          GEMINI_API_KEY: test_gemini_key
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: lint-and-test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Build app
+        run: npm run build
+        env:
+          MONGODB_URI: mongodb://127.0.0.1:27017/ai-resume-builder-test
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_Y2xlcmsuZGV2LXRlc3Q
+          CLERK_SECRET_KEY: sk_test_Y2xlcmsuZGV2LXRlc3Q
+          GEMINI_API_KEY: test_gemini_key
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+        env:
+          CI: true
+          MONGODB_URI: mongodb://127.0.0.1:27017/ai-resume-builder-test
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_Y2xlcmsuZGV2LXRlc3Q
+          CLERK_SECRET_KEY: sk_test_Y2xlcmsuZGV2LXRlc3Q
+          GEMINI_API_KEY: test_gemini_key
+          NEXT_PUBLIC_APP_URL: http://localhost:3000

@@ -3,16 +3,30 @@
 import { motion, AnimatePresence } from "framer-motion"
 import { Download, FileJson, FileText, X } from "lucide-react"
 import { useState } from "react"
+import { Resume } from "@/lib/types"
+import {
+    buildResumeExportElement,
+    downloadBlob,
+    downloadPdfBlob,
+    exportResumeToHtml,
+    exportResumeToJson,
+    exportToDocx,
+    exportToPdfAsync,
+} from "@/lib/exportUtils"
+import { toast } from "sonner"
 
 interface ExportModalProps {
     isOpen: boolean
     onClose: () => void
-    resumeTitle?: string
+    resume?: Resume | null
 }
 
-export function ExportModal({ isOpen, onClose, resumeTitle = "Resume" }: ExportModalProps) {
+export function ExportModal({ isOpen, onClose, resume }: ExportModalProps) {
     const [selectedFormats, setSelectedFormats] = useState<string[]>(["pdf"])
     const [isExporting, setIsExporting] = useState(false)
+
+    const resumeTitle = resume?.title || "Resume"
+    const resumeContent = resume?.content
 
     const formats = [
         { id: "pdf", name: "PDF", icon: FileText, description: "Best for printing and sharing" },
@@ -30,18 +44,57 @@ export function ExportModal({ isOpen, onClose, resumeTitle = "Resume" }: ExportM
     }
 
     const handleExport = async () => {
+        if (!resumeContent) {
+            toast.error("No resume selected for export")
+            return
+        }
+
         setIsExporting(true)
-        // Simulate export
-        await new Promise(resolve => setTimeout(resolve, 2000))
-        setIsExporting(false)
-        onClose()
+        const safeName = resumeTitle.replace(/\s+/g, "_")
+
+        try {
+            for (const format of selectedFormats) {
+                switch (format) {
+                    case "pdf": {
+                        const element = buildResumeExportElement(resumeContent, resumeTitle)
+                        try {
+                            const blob = await exportToPdfAsync(element, { filename: `${safeName}.pdf` })
+                            downloadPdfBlob(blob, `${safeName}.pdf`)
+                        } finally {
+                            element.remove()
+                        }
+                        break
+                    }
+                    case "docx": {
+                        const blob = await exportToDocx(resumeContent, resumeTitle)
+                        downloadBlob(blob, `${safeName}.docx`)
+                        break
+                    }
+                    case "json":
+                        exportResumeToJson(resumeContent, resumeTitle)
+                        break
+                    case "html":
+                        exportResumeToHtml(resumeContent, resumeTitle)
+                        break
+                }
+            }
+
+            toast.success(`Exported ${selectedFormats.length} format(s) successfully`)
+            onClose()
+        } catch (error) {
+            if (process.env.NODE_ENV === 'development') {
+                console.error('Export failed:', error)
+            }
+            toast.error("Export failed. Please try again.")
+        } finally {
+            setIsExporting(false)
+        }
     }
 
     return (
         <AnimatePresence>
             {isOpen && (
                 <>
-                    {/* Backdrop */}
                     <motion.div
                         className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
                         initial={{ opacity: 0 }}
@@ -50,7 +103,6 @@ export function ExportModal({ isOpen, onClose, resumeTitle = "Resume" }: ExportM
                         onClick={onClose}
                     />
 
-                    {/* Modal */}
                     <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
                         <motion.div
                             className="relative w-full max-w-md overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-background/95 to-background/90 backdrop-blur-xl shadow-2xl"
@@ -59,10 +111,8 @@ export function ExportModal({ isOpen, onClose, resumeTitle = "Resume" }: ExportM
                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
                             transition={{ type: "spring", duration: 0.5 }}
                         >
-                            {/* Gradient Background */}
                             <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10" />
 
-                            {/* Header */}
                             <div className="relative flex items-center justify-between p-6 border-b border-white/10">
                                 <div>
                                     <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
@@ -81,55 +131,58 @@ export function ExportModal({ isOpen, onClose, resumeTitle = "Resume" }: ExportM
                                 </button>
                             </div>
 
-                            {/* Content */}
                             <div className="relative p-6 space-y-4">
-                                <p className="text-sm text-muted-foreground">
-                                    Select the formats you want to export:
-                                </p>
+                                {!resumeContent ? (
+                                    <p className="text-sm text-muted-foreground">
+                                        Select a resume to export.
+                                    </p>
+                                ) : (
+                                    <>
+                                        <p className="text-sm text-muted-foreground">
+                                            Select the formats you want to export:
+                                        </p>
 
-                                {/* Format Options */}
-                                <div className="space-y-2">
-                                    {formats.map((format) => {
-                                        const Icon = format.icon
-                                        const isSelected = selectedFormats.includes(format.id)
+                                        <div className="space-y-2">
+                                            {formats.map((format) => {
+                                                const Icon = format.icon
+                                                const isSelected = selectedFormats.includes(format.id)
 
-                                        return (
-                                            <motion.button
-                                                key={format.id}
-                                                onClick={() => toggleFormat(format.id)}
-                                                className={`w-full flex items-start gap-4 p-4 rounded-xl border transition-all ${isSelected
-                                                        ? "border-primary bg-primary/10"
-                                                        : "border-white/10 bg-white/5 hover:bg-white/10"
-                                                    }`}
-                                                whileHover={{ scale: 1.02 }}
-                                                whileTap={{ scale: 0.98 }}
-                                            >
-                                                <div className={`p-2 rounded-lg ${isSelected ? "bg-primary/20" : "bg-white/10"
-                                                    }`}>
-                                                    <Icon className={`h-5 w-5 ${isSelected ? "text-primary" : "text-muted-foreground"
-                                                        }`} />
-                                                </div>
-                                                <div className="flex-1 text-left">
-                                                    <div className="font-medium text-foreground">{format.name}</div>
-                                                    <div className="text-xs text-muted-foreground mt-1">
-                                                        {format.description}
-                                                    </div>
-                                                </div>
-                                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isSelected
-                                                        ? "border-primary bg-primary"
-                                                        : "border-white/20"
-                                                    }`}>
-                                                    {isSelected && (
-                                                        <div className="w-2 h-2 rounded-full bg-primary-foreground" />
-                                                    )}
-                                                </div>
-                                            </motion.button>
-                                        )
-                                    })}
-                                </div>
+                                                return (
+                                                    <motion.button
+                                                        key={format.id}
+                                                        onClick={() => toggleFormat(format.id)}
+                                                        className={`w-full flex items-start gap-4 p-4 rounded-xl border transition-all ${isSelected
+                                                            ? "border-primary bg-primary/10"
+                                                            : "border-white/10 bg-white/5 hover:bg-white/10"
+                                                            }`}
+                                                        whileHover={{ scale: 1.02 }}
+                                                        whileTap={{ scale: 0.98 }}
+                                                    >
+                                                        <div className={`p-2 rounded-lg ${isSelected ? "bg-primary/20" : "bg-white/10"}`}>
+                                                            <Icon className={`h-5 w-5 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
+                                                        </div>
+                                                        <div className="flex-1 text-left">
+                                                            <div className="font-medium text-foreground">{format.name}</div>
+                                                            <div className="text-xs text-muted-foreground mt-1">
+                                                                {format.description}
+                                                            </div>
+                                                        </div>
+                                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isSelected
+                                                            ? "border-primary bg-primary"
+                                                            : "border-white/20"
+                                                            }`}>
+                                                            {isSelected && (
+                                                                <div className="w-2 h-2 rounded-full bg-primary-foreground" />
+                                                            )}
+                                                        </div>
+                                                    </motion.button>
+                                                )
+                                            })}
+                                        </div>
+                                    </>
+                                )}
                             </div>
 
-                            {/* Footer */}
                             <div className="relative flex items-center justify-end gap-3 p-6 border-t border-white/10">
                                 <button
                                     onClick={onClose}
@@ -141,7 +194,7 @@ export function ExportModal({ isOpen, onClose, resumeTitle = "Resume" }: ExportM
                                 <motion.button
                                     onClick={handleExport}
                                     className="px-6 py-2 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                                    disabled={selectedFormats.length === 0 || isExporting}
+                                    disabled={!resumeContent || selectedFormats.length === 0 || isExporting}
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
                                 >

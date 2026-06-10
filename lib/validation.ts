@@ -109,16 +109,20 @@ export const updateResumeSchema = z.object({
 // ============================================
 export const generateSummarySchema = z.object({
     jobTitle: z.string().min(1, 'Job title is required').max(100),
-    experience: z.string().max(2000).optional(),
-    skills: z.string().max(500).optional(),
+    experience: z.union([z.string().max(2000), z.array(z.record(z.string(), z.unknown()))]).optional(),
+    skills: z.union([z.string().max(500), z.array(z.record(z.string(), z.unknown()))]).optional(),
 });
 
 export const generateBulletsSchema = z.object({
     jobTitle: z.string().max(100).optional(),
     context: z.enum(['experience', 'project']),
     companyName: z.string().max(100).optional(),
-    experience: z.string().max(2000).optional(),
-    skills: z.string().max(500).optional(),
+    experience: z.union([z.string().max(2000), z.array(z.record(z.string(), z.unknown()))]).optional(),
+    skills: z.union([z.string().max(500), z.array(z.record(z.string(), z.unknown()))]).optional(),
+});
+
+export const reviewResumeSchema = z.object({
+    resumeContent: resumeContentSchema,
 });
 
 export const atsScoreSchema = z.object({

@@ -2,7 +2,7 @@
 
 A modern, AI-powered resume builder built with Next.js, TypeScript, and Gemini AI. Create professional, ATS-optimized resumes in minutes with intelligent AI assistance.
 
-![AI Resume Builder](https://img.shields.io/badge/Next.js-16.0.8-black)
+![AI Resume Builder](https://img.shields.io/badge/Next.js-16-black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
@@ -33,14 +33,14 @@ A modern, AI-powered resume builder built with Next.js, TypeScript, and Gemini A
 
 ## 🚀 Tech Stack
 
-- **Framework**: Next.js 16.0.8 (App Router)
+- **Framework**: Next.js 16 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
 - **UI Components**: shadcn/ui + Radix UI
 - **Database**: MongoDB with Mongoose
 - **Authentication**: Clerk
-- **AI**: Google Gemini 2.0 Flash
-- **Rate Limiting**: Upstash Redis (Recommended for Production)
+- **AI**: Google Gemini 2.0 Flash via Vercel AI SDK
+- **Rate Limiting**: Upstash Redis (production) with in-memory fallback (local)
 - **Security**: Share Token Expiration, Circuit Breakers
 - **Animations**: Framer Motion
 - **Icons**: Lucide React
@@ -68,7 +68,13 @@ npm install
 
 3. **Environment Variables**
 
-Create a `.env.local` file in the root directory:
+Copy `.env.example` to `.env.local` and fill in your values:
+
+```bash
+cp .env.example .env.local
+```
+
+Required variables:
 
 ```env
 # Clerk Authentication
@@ -85,16 +91,22 @@ GEMINI_API_KEY=your_gemini_api_key
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 # Upstash Redis (Optional - Recommended for Production Rate Limiting)
-UPSTASH_REDIS_URL=your_upstash_redis_url
-UPSTASH_REDIS_TOKEN=your_upstash_redis_token
+UPSTASH_REDIS_REST_URL=your_upstash_redis_rest_url
+UPSTASH_REDIS_REST_TOKEN=your_upstash_redis_rest_token
 ```
 
-4. **Run the development server**
+4. **Run tests (optional)**
+```bash
+npm run test
+npm run test:e2e
+```
+
+5. **Run the development server**
 ```bash
 npm run dev
 ```
 
-5. **Open your browser**
+6. **Open your browser**
 Navigate to [http://localhost:3000](http://localhost:3000)
 
 ## 📁 Project Structure
@@ -170,12 +182,11 @@ AI-Resume-Builder/
 ## 🎨 Customization
 
 ### Adding New Templates
-1. Create template component in `components/resume/templates/`
-2. Add template preview
-3. Register in template selector
+1. Create template component in `lib/templates/`
+2. Register in `lib/templates/index.ts`
 
 ### Modifying AI Prompts
-Edit prompts in `service/AIService.ts` to customize AI behavior
+Edit prompts in `app/api/ai/*/route.ts` or shared helpers in `lib/ai/`
 
 ### Styling
 - Tailwind classes in components
@@ -235,17 +246,16 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **Total Components**: 50+
 - **API Endpoints**: 15+
-- **AI Features**: 5+
-- **Supported Formats**: PDF
+- **AI Features**: 7
+- **Supported Formats**: PDF, DOCX, JSON, HTML
 - **Database**: MongoDB
 - **Authentication**: Clerk
 
 ## 🔮 Future Enhancements
 
-- [ ] Multiple resume templates
-- [ ] Cover letter generator
 - [ ] LinkedIn profile import
-- [ ] Resume analytics
+- [ ] Vector/text-based PDF export (ATS-optimized)
+- [ ] Streaming AI responses in the editor
 - [ ] Team collaboration features
 - [ ] Multi-language support
 

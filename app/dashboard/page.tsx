@@ -413,7 +413,7 @@ function Dashboard() {
             <ExportModal
                 isOpen={exportModalOpen}
                 onClose={() => setExportModalOpen(false)}
-                resumeTitle={selectedResume?.title}
+                resume={selectedResume}
             />
 
             {/* Keyboard Shortcuts */}

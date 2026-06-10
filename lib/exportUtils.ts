@@ -271,3 +271,94 @@ export async function exportToDocx(resumeInfo: ResumeContent, title: string): Pr
 
     return await Packer.toBlob(doc);
 }
+
+export function downloadBlob(blob: Blob, filename: string) {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+export function exportResumeToJson(resumeInfo: ResumeContent, title: string) {
+    const payload = {
+        title,
+        exportedAt: new Date().toISOString(),
+        content: resumeInfo,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    downloadBlob(blob, `${title.replace(/\s+/g, '_')}.json`);
+}
+
+export function exportResumeToHtml(resumeInfo: ResumeContent, title: string) {
+    const skills = resumeInfo.skills?.map((s) => s.name).filter(Boolean).join(', ') || '';
+    const experience = resumeInfo.experience?.map((exp) => `
+        <section>
+            <h3>${exp.title || ''}</h3>
+            <p><strong>${exp.companyName || ''}</strong> | ${exp.startDate || ''} - ${exp.currentlyWorking ? 'Present' : exp.endDate || ''}</p>
+            <div>${exp.workSummary || ''}</div>
+        </section>
+    `).join('') || '';
+
+    const education = resumeInfo.education?.map((edu) => `
+        <section>
+            <h3>${edu.universityName || ''}</h3>
+            <p>${edu.degree || ''} ${edu.major ? `in ${edu.major}` : ''}</p>
+            <p>${edu.startDate || ''} - ${edu.endDate || ''}</p>
+        </section>
+    `).join('') || '';
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>${title}</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; color: #111; }
+        h1, h2 { margin-bottom: 0.25rem; }
+        section { margin-bottom: 1.5rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>${resumeInfo.personalDetails?.firstName || ''} ${resumeInfo.personalDetails?.lastName || ''}</h1>
+        <h2>${resumeInfo.personalDetails?.jobTitle || ''}</h2>
+        <p>${resumeInfo.personalDetails?.email || ''} | ${resumeInfo.personalDetails?.phone || ''}</p>
+    </header>
+    ${resumeInfo.summary ? `<section><h2>Summary</h2><p>${resumeInfo.summary}</p></section>` : ''}
+    ${experience ? `<section><h2>Experience</h2>${experience}</section>` : ''}
+    ${education ? `<section><h2>Education</h2>${education}</section>` : ''}
+    ${skills ? `<section><h2>Skills</h2><p>${skills}</p></section>` : ''}
+</body>
+</html>`;
+
+    const blob = new Blob([html], { type: 'text/html' });
+    downloadBlob(blob, `${title.replace(/\s+/g, '_')}.html`);
+}
+
+export function buildResumeExportElement(resumeInfo: ResumeContent, title: string): HTMLDivElement {
+    const container = document.createElement('div');
+    container.id = 'resume-export-preview';
+    container.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;background:#fff;color:#111;padding:40px;font-family:Arial,sans-serif;';
+    container.innerHTML = exportResumeToHtmlString(resumeInfo, title);
+    document.body.appendChild(container);
+    return container;
+}
+
+function exportResumeToHtmlString(resumeInfo: ResumeContent, title: string): string {
+    const skills = resumeInfo.skills?.map((s) => s.name).filter(Boolean).join(', ') || '';
+    return `
+        <div>
+            <h1 style="margin:0 0 8px;">${resumeInfo.personalDetails?.firstName || ''} ${resumeInfo.personalDetails?.lastName || ''}</h1>
+            <h2 style="margin:0 0 8px;font-size:18px;">${resumeInfo.personalDetails?.jobTitle || title}</h2>
+            <p style="margin:0 0 16px;">${resumeInfo.personalDetails?.email || ''} | ${resumeInfo.personalDetails?.phone || ''}</p>
+            ${resumeInfo.summary ? `<h3>Summary</h3><p>${resumeInfo.summary}</p>` : ''}
+            ${resumeInfo.experience?.length ? `<h3>Experience</h3>${resumeInfo.experience.map((exp) => `<p><strong>${exp.title}</strong> at ${exp.companyName || ''}</p>`).join('')}` : ''}
+            ${resumeInfo.education?.length ? `<h3>Education</h3>${resumeInfo.education.map((edu) => `<p>${edu.universityName} - ${edu.degree || ''}</p>`).join('')}` : ''}
+            ${skills ? `<h3>Skills</h3><p>${skills}</p>` : ''}
+        </div>
+    `;
+}

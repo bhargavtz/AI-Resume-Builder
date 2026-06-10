@@ -141,9 +141,13 @@ export interface ATSScoreRequest {
 export interface ATSScoreResponse {
     score: number;
     summary: string;
+    strengths: string[];
     improvements: string[];
-    keywordMatch: number;
-    formatScore: number;
+    keywords: {
+        found: string[];
+        missing: string[];
+    };
+    rawResponse?: string;
 }
 
 export interface CoverLetterRequest {
@@ -170,13 +174,37 @@ export interface ImproveResumeRequest {
     targetJobTitle?: string;
 }
 
+export interface SectionImprovement {
+    score: number;
+    suggestions: string[];
+}
+
 export interface ImproveResumeResponse {
     overallScore: number;
     summary: string;
-    sectionAnalysis: {
-        section: string;
+    sections: Record<string, SectionImprovement>;
+    topPriorities: string[];
+    missingKeywords?: string[];
+}
+
+export interface ReviewResumeResponse {
+    overallScore: number;
+    overallFeedback: string;
+    sections: Record<string, SectionImprovement & { feedback?: string }>;
+    strengths: string[];
+    improvements: string[];
+    atsCompatibility?: {
         score: number;
-        suggestions: string[];
-    }[];
+        issues: string[];
+        recommendations: string[];
+    };
+    grammarAndSpelling?: {
+        score: number;
+        issues: string[];
+    };
+    formatting?: {
+        score: number;
+        feedback: string;
+    };
     topPriorities: string[];
 }

@@ -8,6 +8,8 @@ import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({ subsets: ["latin"] });
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
     title: "AI Resume Builder",
     description: "Build your professional resume with AI",

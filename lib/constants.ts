@@ -54,6 +54,11 @@ export const RESUME_STATUS = {
 
 export const DEFAULT_THEME_COLOR = '#3b82f6';
 
+export const AI = {
+    GEMINI_MODEL: 'gemini-2.0-flash',
+    REVIEW_RATE_LIMIT: 5,
+} as const;
+
 export const SECTION_ORDER = {
     DEFAULT: ['summary', 'experience', 'education', 'skills'] as const,
 } as const;

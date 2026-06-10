@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { motion, Variants } from "framer-motion";
 import {
-    Sparkles, FileText, Target, PenTool, Lightbulb, TrendingUp,
+    Sparkles, FileText, Target, PenTool, Lightbulb, TrendingUp, ClipboardCheck,
     Loader2, Copy, Check, ArrowRight
 } from "lucide-react";
 import AIService from "@/service/AIService";
@@ -56,6 +56,13 @@ const tools = [
         description: "Get improvement suggestions",
         icon: TrendingUp,
         color: "from-indigo-500 to-violet-500",
+    },
+    {
+        id: "review",
+        name: "Resume Review",
+        description: "Comprehensive resume feedback",
+        icon: ClipboardCheck,
+        color: "from-rose-500 to-orange-500",
     },
 ];
 
@@ -132,6 +139,18 @@ export default function AIToolsPage() {
                         targetJobTitle: jobTitle
                     });
                     setResult({ type: "improve", content: response });
+                    break;
+
+                case "review":
+                    response = await AIService.reviewResume({
+                        resumeContent: {
+                            personalDetails: { jobTitle },
+                            summary: experience,
+                            experience: [{ id: "exp-1", title: jobTitle, workSummary: experience }],
+                            skills: skills.split(",").map((s, i) => ({ id: `skill-${i}`, name: s.trim(), rating: 0 }))
+                        },
+                    });
+                    setResult({ type: "review", content: response });
                     break;
             }
         } catch (error: any) {
@@ -235,6 +254,38 @@ export default function AIToolsPage() {
                                             <span className="text-primary">→</span>
                                             {item}
                                         </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                    </div>
+                );
+
+            case "review":
+                return (
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-4">
+                            <div className="text-4xl font-bold text-primary">
+                                {result.content.overallScore}/100
+                            </div>
+                            <p className="text-muted-foreground">{result.content.overallFeedback}</p>
+                        </div>
+                        {result.content.strengths?.length > 0 && (
+                            <div>
+                                <h4 className="font-semibold mb-2">Strengths:</h4>
+                                <ul className="space-y-1 text-sm text-muted-foreground">
+                                    {result.content.strengths.map((item: string, i: number) => (
+                                        <li key={i}>• {item}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                        {result.content.improvements?.length > 0 && (
+                            <div>
+                                <h4 className="font-semibold mb-2">Improvements:</h4>
+                                <ul className="space-y-1 text-sm text-muted-foreground">
+                                    {result.content.improvements.map((item: string, i: number) => (
+                                        <li key={i}>• {item}</li>
                                     ))}
                                 </ul>
                             </div>

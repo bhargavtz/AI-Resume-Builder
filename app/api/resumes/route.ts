@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+
+export const dynamic = 'force-dynamic';
 import dbConnect from "@/lib/db";
 import Resume from "@/lib/models/resume";
 import { auth } from "@clerk/nextjs/server";
 import { createResumeSchema, validateData } from "@/lib/validation";
+import { escapeRegex } from "@/lib/escape-regex";
 import { successResponse, errorResponse, ErrorCodes, handleApiError } from "@/lib/api-error";
 import { nanoid } from "nanoid";
 import logger from "@/lib/logger";
@@ -83,7 +86,7 @@ export async function GET(req: NextRequest) {
 
         // Add search filter
         if (search) {
-            query.title = { $regex: search, $options: 'i' };
+            query.title = { $regex: escapeRegex(search), $options: 'i' };
         }
 
         // Determine sort order

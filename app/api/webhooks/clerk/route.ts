@@ -4,11 +4,15 @@
  */
 
 import { NextRequest } from 'next/server';
+
+export const dynamic = 'force-dynamic';
 import { Webhook } from 'svix';
 import { WebhookEvent } from '@clerk/nextjs/server';
 import { successResponse, errorResponse, ErrorCodes } from '@/lib/api-error';
 import logger from '@/lib/logger';
 import { nanoid } from 'nanoid';
+import dbConnect from '@/lib/db';
+import Resume from '@/lib/models/resume';
 
 export async function POST(req: NextRequest) {
     const requestId = nanoid(16);
@@ -77,10 +81,16 @@ export async function POST(req: NextRequest) {
                 // TODO: Update user profile in database if needed
                 break;
 
-            case 'user.deleted':
-                logger.info('User deleted', { userId: evt.data.id }, evt.data.id, requestId);
-                // TODO: Handle user deletion (soft delete resumes, etc.)
+            case 'user.deleted': {
+                const deletedUserId = evt.data.id;
+                logger.info('User deleted', { userId: deletedUserId }, deletedUserId, requestId);
+                await dbConnect();
+                await Resume.updateMany(
+                    { userId: deletedUserId, isDeleted: false },
+                    { $set: { isDeleted: true, status: 'archived' } }
+                );
                 break;
+            }
 
             default:
                 logger.debug('Unhandled webhook event', { eventType }, undefined, requestId);

@@ -66,7 +66,7 @@ function Skills({ enabledNext }: { enabledNext: (v: boolean) => void }) {
         try {
             const response = await axios.post('/api/ai/suggest-skills', {
                 jobTitle: resumeInfo.personalDetails.jobTitle,
-                existingSkills: skillsList.map(s => s.name)
+                currentSkills: skillsList.map(s => s.name).filter(Boolean)
             })
 
             const suggestedSkills = response.data.skills || []
